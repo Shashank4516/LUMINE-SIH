@@ -1,8 +1,15 @@
 import LanguageSwitcher from "./LanguageSwitcher";
 import ThemeToggle from "./ThemeToggle";
+import UserProfileDropdown from "./UserProfileDropdown";
 import logoImage from "../assets/img/Adobe Express - file (1).png";
 
 function Header({ currentLang, onLanguageChange }) {
+  // Check if user is logged in
+  const isLoggedIn = () => {
+    const userData = localStorage.getItem("lumine_user");
+    return !!userData;
+  };
+
   return (
     <header className="w-full bg-white/95 dark:bg-gray-900/95 backdrop-blur-md sticky top-0 z-50 border-b border-saffron-100 dark:border-gray-700 shadow-sm">
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
@@ -29,6 +36,7 @@ function Header({ currentLang, onLanguageChange }) {
             currentLang={currentLang}
             onLanguageChange={onLanguageChange}
           />
+          {isLoggedIn() && <UserProfileDropdown />}
         </div>
       </div>
     </header>

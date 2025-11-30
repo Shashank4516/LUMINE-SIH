@@ -1,4 +1,5 @@
 import React from "react";
+import logoImage from "../../assets/img/Adobe Express - file (1).png";
 
 const ReviewStep = ({ isActive, temple, date, timeSlot, memberCount }) => {
   if (!isActive) return null;
@@ -23,73 +24,77 @@ const ReviewStep = ({ isActive, temple, date, timeSlot, memberCount }) => {
   return (
     <div className="p-6 md:p-8 space-y-6">
       <div>
-        <h2 className="text-2xl font-serif font-bold text-gray-900 mb-2">
+        <h2 className="text-2xl font-serif font-bold text-gray-900 dark:text-gray-100 mb-2">
           Review Your Booking
         </h2>
-        <p className="text-gray-600 text-sm">
+        <p className="text-gray-600 dark:text-gray-400 text-sm">
           Please review your details before confirming
         </p>
       </div>
 
       <div className="space-y-4">
-        <div className="bg-gray-50 rounded-lg p-4">
+        <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 transition-colors">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-saffron-100 rounded-lg flex items-center justify-center">
-              <i className="ph ph-temple text-saffron-600 text-xl"></i>
+            <div className="w-12 h-12 bg-saffron-50 dark:bg-gray-700 rounded-lg flex items-center justify-center overflow-hidden p-1.5">
+              <img
+                src={logoImage}
+                alt="Temple Logo"
+                className="w-full h-full object-contain dark:brightness-0 dark:invert"
+              />
             </div>
             <div>
-              <p className="text-xs text-gray-500 uppercase font-semibold">
+              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">
                 Temple
               </p>
-              <p className="text-lg font-semibold text-gray-900">
+              <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 {templeNames[temple] || "Not selected"}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-gray-50 rounded-lg p-4">
+        <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 transition-colors">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-saffron-100 rounded-lg flex items-center justify-center">
-              <i className="ph ph-calendar text-saffron-600 text-xl"></i>
+            <div className="w-12 h-12 bg-saffron-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+              <i className="ph ph-calendar text-saffron-600 dark:text-saffron-400 text-xl"></i>
             </div>
             <div>
-              <p className="text-xs text-gray-500 uppercase font-semibold">
+              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">
                 Date
               </p>
-              <p className="text-lg font-semibold text-gray-900">
+              <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 {formatDate(date)}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-gray-50 rounded-lg p-4">
+        <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 transition-colors">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-saffron-100 rounded-lg flex items-center justify-center">
-              <i className="ph ph-clock text-saffron-600 text-xl"></i>
+            <div className="w-12 h-12 bg-saffron-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+              <i className="ph ph-clock text-saffron-600 dark:text-saffron-400 text-xl"></i>
             </div>
             <div>
-              <p className="text-xs text-gray-500 uppercase font-semibold">
+              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">
                 Time Slot
               </p>
-              <p className="text-lg font-semibold text-gray-900">
+              <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 {timeSlot || "Not selected"}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-gray-50 rounded-lg p-4">
+        <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4 transition-colors">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-saffron-100 rounded-lg flex items-center justify-center">
-              <i className="ph ph-users text-saffron-600 text-xl"></i>
+            <div className="w-12 h-12 bg-saffron-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+              <i className="ph ph-users text-saffron-600 dark:text-saffron-400 text-xl"></i>
             </div>
             <div>
-              <p className="text-xs text-gray-500 uppercase font-semibold">
+              <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold">
                 Members
               </p>
-              <p className="text-lg font-semibold text-gray-900">
+              <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 {memberCount} {memberCount === 1 ? "member" : "members"}
               </p>
             </div>
