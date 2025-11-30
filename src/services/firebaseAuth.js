@@ -6,9 +6,17 @@ import {
   sendPasswordResetEmail,
   updateProfile,
   onAuthStateChanged,
-} from 'firebase/auth';
-import { doc, setDoc, getDoc, query, where, collection, getDocs } from 'firebase/firestore';
-import { auth, db } from '../config/firebase';
+} from "firebase/auth";
+import {
+  doc,
+  setDoc,
+  getDoc,
+  query,
+  where,
+  collection,
+  getDocs,
+} from "firebase/firestore";
+import { auth, db } from "../config/firebase";
 
 // Check if Firebase is configured
 const isFirebaseConfigured = auth !== null && db !== null;
@@ -22,70 +30,59 @@ const isFirebaseConfigured = auth !== null && db !== null;
  * @param {string} role - User role (default: 'devotee')
  * @returns {Promise<{user: object, token: string}>}
  */
-export const registerUser = async (email, password, fullName, phoneNumber, role = 'devotee') => {
+export const registerUser = async (
+  email,
+  password,
+  fullName,
+  phoneNumber,
+  role = "devotee"
+) => {
+  console.log("registerUser: Starting...");
+
   if (!isFirebaseConfigured) {
-    throw new Error('Firebase is not configured. Please add your Firebase credentials to .env file.');
+    throw new Error(
+      "Firebase is not configured. Please add your Firebase credentials to .env file."
+    );
   }
-  
+
   try {
     // Create user in Firebase Authentication
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    console.log("registerUser: Creating user...");
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
     const user = userCredential.user;
+    console.log("registerUser: User created:", user.uid);
 
-    // Update user profile with display name
-    await updateProfile(user, {
-      displayName: fullName,
-    });
-
-    // Store additional user data in Firestore
-    // This is where we store role, phone number, etc.
-    await setDoc(doc(db, 'users', user.uid), {
+    // Prepare user data
+    const userData = {
       uid: user.uid,
       email: user.email,
-      fullName: fullName,
-      phoneNumber: phoneNumber,
+      displayName: fullName,
       role: role,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    });
+      phoneNumber: phoneNumber,
+    };
 
-    // Get the ID token for your backend (if needed)
-    // Get token with timeout to prevent hanging
-    let token = null;
-    try {
-      token = await Promise.race([
-        user.getIdToken(),
-        new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Token retrieval timeout')), 5000)
-        )
-      ]);
-    } catch (error) {
-      console.warn('Token retrieval failed or timed out, continuing without token:', error);
-      // Try to get token in background (non-blocking)
-      user.getIdToken(true).then(t => {
-        if (t) {
-          // Update token in localStorage if available
-          const storedUser = localStorage.getItem('lumine_user');
-          if (storedUser) {
-            localStorage.setItem('lumine_token', t);
-          }
-        }
-      }).catch(() => {
-        // Ignore background token retrieval errors
-      });
-    }
+    // Do background operations (non-blocking) - don't await
+    Promise.all([
+      updateProfile(user, { displayName: fullName }).catch(() => {}),
+      setDoc(doc(db, "users", user.uid), {
+        ...userData,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }).catch(() => {}),
+    ]);
 
+    // Return immediately
+    console.log("registerUser: Done, returning...");
     return {
-      user: {
-        uid: user.uid,
-        email: user.email,
-        displayName: fullName,
-        role: role,
-        phoneNumber: phoneNumber,
-      },
-      token: token || 'pending', // Return a placeholder if token is null
+      user: userData,
+      token: "pending",
     };
   } catch (error) {
+    console.error("registerUser: Error:", error);
     throw handleFirebaseError(error);
   }
 };
@@ -100,55 +97,67 @@ export const registerUser = async (email, password, fullName, phoneNumber, role 
  */
 export const signInUser = async (userId, password, role = null) => {
   if (!isFirebaseConfigured) {
-    throw new Error('Firebase is not configured. Please add your Firebase credentials to .env file.');
+    throw new Error(
+      "Firebase is not configured. Please add your Firebase credentials to .env file."
+    );
   }
-  
+
   try {
     let email = userId.trim();
-    
+
     // Check if userId is email or phone number
-    const isEmail = email.includes('@');
-    
+    const isEmail = email.includes("@");
+
     // If it's a phone number, look up the email in Firestore
     if (!isEmail) {
       const phoneNumber = email;
-      const usersRef = collection(db, 'users');
-      const q = query(usersRef, where('phoneNumber', '==', phoneNumber));
+      const usersRef = collection(db, "users");
+      const q = query(usersRef, where("phoneNumber", "==", phoneNumber));
       const querySnapshot = await getDocs(q);
-      
+
       if (querySnapshot.empty) {
-        throw new Error('No account found with this phone number. Please use your email address.');
+        throw new Error(
+          "No account found with this phone number. Please use your email address."
+        );
       }
-      
+
       // Get the first matching user's email
       const userDoc = querySnapshot.docs[0];
       email = userDoc.data().email;
     }
 
     // Sign in with email and password
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
     const user = userCredential.user;
 
     // Get user data from Firestore to check role
-    const userDoc = await getDoc(doc(db, 'users', user.uid));
-    
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+
     if (!userDoc.exists()) {
-      throw new Error('User data not found. Please contact support.');
+      throw new Error("User data not found. Please contact support.");
     }
 
     const userData = userDoc.data();
-    const userRole = userData.role || 'devotee';
+    const userRole = userData.role || "devotee";
 
     // Validate role if specified
     if (role && userRole !== role) {
       await signOut(auth);
       const roleNames = {
-        devotee: 'Devotee',
-        mandir_admin: 'Admin',
-        security_guard: 'Security',
-        parking_incharge: 'Parking'
+        devotee: "Devotee",
+        mandir_admin: "Admin",
+        security_guard: "Security",
+        parking_incharge: "Parking",
       };
-      throw new Error(`Access denied. This account is registered as ${roleNames[userRole] || userRole}, not ${roleNames[role] || role}.`);
+      throw new Error(
+        `Access denied. This account is registered as ${
+          roleNames[userRole] || userRole
+        }, not ${roleNames[role] || role}.`
+      );
     }
 
     // Get the ID token
@@ -156,10 +165,10 @@ export const signInUser = async (userId, password, role = null) => {
 
     // Determine redirect URL based on role
     const redirectUrls = {
-      devotee: 'dashboard.html',
-      mandir_admin: 'admindashboard.html',
-      security_guard: 'security.html',
-      parking_incharge: 'parking.html',
+      devotee: "dashboard.html",
+      mandir_admin: "admindashboard.html",
+      security_guard: "security.html",
+      parking_incharge: "parking.html",
     };
 
     return {
@@ -171,7 +180,7 @@ export const signInUser = async (userId, password, role = null) => {
         phoneNumber: userData.phoneNumber,
       },
       token: token,
-      redirectUrl: redirectUrls[userRole] || 'dashboard.html',
+      redirectUrl: redirectUrls[userRole] || "dashboard.html",
     };
   } catch (error) {
     throw handleFirebaseError(error);
@@ -184,16 +193,18 @@ export const signInUser = async (userId, password, role = null) => {
  */
 export const signOutUser = async () => {
   if (!isFirebaseConfigured) {
-    throw new Error('Firebase is not configured. Please add your Firebase credentials to .env file.');
+    throw new Error(
+      "Firebase is not configured. Please add your Firebase credentials to .env file."
+    );
   }
-  
+
   try {
     await signOut(auth);
     // Clear local storage
-    localStorage.removeItem('lumine_token');
-    localStorage.removeItem('lumine_user');
-    sessionStorage.removeItem('lumine_token');
-    sessionStorage.removeItem('lumine_user');
+    localStorage.removeItem("lumine_token");
+    localStorage.removeItem("lumine_user");
+    sessionStorage.removeItem("lumine_token");
+    sessionStorage.removeItem("lumine_user");
   } catch (error) {
     throw handleFirebaseError(error);
   }
@@ -206,9 +217,11 @@ export const signOutUser = async () => {
  */
 export const resetPassword = async (email) => {
   if (!isFirebaseConfigured) {
-    throw new Error('Firebase is not configured. Please add your Firebase credentials to .env file.');
+    throw new Error(
+      "Firebase is not configured. Please add your Firebase credentials to .env file."
+    );
   }
-  
+
   try {
     await sendPasswordResetEmail(auth, email);
   } catch (error) {
@@ -226,7 +239,7 @@ export const getCurrentUser = async () => {
       unsubscribe();
       if (user) {
         // Get user data from Firestore
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
           const userData = userDoc.data();
           resolve({
@@ -257,24 +270,36 @@ export const getCurrentUser = async () => {
  */
 const handleFirebaseError = (error) => {
   const errorMessages = {
-    'auth/email-already-in-use': 'This email is already registered. Please sign in instead.',
-    'auth/invalid-email': 'Invalid email address. Please check and try again.',
-    'auth/operation-not-allowed': 'Email/password accounts are not enabled. Please contact support.',
-    'auth/weak-password': 'Password is too weak. Please use at least 8 characters.',
-    'auth/user-disabled': 'This account has been disabled. Please contact support.',
-    'auth/user-not-found': 'No account found with this email. Please register first.',
-    'auth/wrong-password': 'Incorrect password. Please try again.',
-    'auth/too-many-requests': 'Too many failed attempts. Please try again later.',
-    'auth/network-request-failed': 'Network error. Please check your connection.',
-    'auth/invalid-credential': 'Invalid email or password. Please check your credentials.',
-    'auth/invalid-verification-code': 'Invalid verification code. Please try again.',
-    'auth/code-expired': 'Verification code has expired. Please request a new one.',
+    "auth/email-already-in-use":
+      "This email is already registered. Please sign in instead.",
+    "auth/invalid-email": "Invalid email address. Please check and try again.",
+    "auth/operation-not-allowed":
+      "Email/password accounts are not enabled. Please contact support.",
+    "auth/weak-password":
+      "Password is too weak. Please use at least 8 characters.",
+    "auth/user-disabled":
+      "This account has been disabled. Please contact support.",
+    "auth/user-not-found":
+      "No account found with this email. Please register first.",
+    "auth/wrong-password": "Incorrect password. Please try again.",
+    "auth/too-many-requests":
+      "Too many failed attempts. Please try again later.",
+    "auth/network-request-failed":
+      "Network error. Please check your connection.",
+    "auth/invalid-credential":
+      "Invalid email or password. Please check your credentials.",
+    "auth/invalid-verification-code":
+      "Invalid verification code. Please try again.",
+    "auth/code-expired":
+      "Verification code has expired. Please request a new one.",
   };
 
-  const message = errorMessages[error.code] || error.message || 'An error occurred. Please try again.';
+  const message =
+    errorMessages[error.code] ||
+    error.message ||
+    "An error occurred. Please try again.";
   const customError = new Error(message);
   customError.code = error.code;
   customError.originalError = error;
   return customError;
 };
-

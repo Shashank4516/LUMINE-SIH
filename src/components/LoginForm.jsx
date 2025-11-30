@@ -56,16 +56,20 @@ function LoginForm({
 
     try {
       // Use Firebase authentication
-      // signInUser supports both email and phone number
-      const result = await signInUser(userId.trim(), password, currentRole);
+      const result = await signInUser(
+        userId.trim(),
+        password,
+        currentRole === "devotee" ? "devotee" : null
+      );
 
-      // Store token and user data based on remember me
-      if (rememberMe) {
-        localStorage.setItem("lumine_token", result.token);
-        localStorage.setItem("lumine_user", JSON.stringify(result.user));
-      } else {
-        sessionStorage.setItem("lumine_token", result.token);
-        sessionStorage.setItem("lumine_user", JSON.stringify(result.user));
+      // Save user data to localStorage or sessionStorage based on remember me
+      const storage = rememberMe ? localStorage : sessionStorage;
+      storage.setItem("lumine_token", result.token);
+      storage.setItem("lumine_user", JSON.stringify(result.user));
+
+      if (!rememberMe) {
+        localStorage.removeItem("lumine_token");
+        localStorage.removeItem("lumine_user");
       }
 
       handleSuccess(result);
@@ -105,58 +109,66 @@ function LoginForm({
   };
 
   return (
-    <div className="w-full max-w-md mx-auto lg:mx-0">
+    <div className="w-full mx-auto lg:mx-0">
       <div className="lg:hidden text-center mb-8 space-y-2">
-        <h1 className="font-serif text-3xl font-bold text-gray-900">
+        <h1 className="font-serif text-3xl font-bold text-gray-900 dark:text-gray-100">
           <span>{t.welcomeMain}</span>{" "}
-          <span className="text-saffron-600">{t.welcomeSub}</span>
+          <span className="text-saffron-600 dark:text-saffron-400">
+            {t.welcomeSub}
+          </span>
         </h1>
       </div>
       <div
-        className={`bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden relative ${
+        className={`bg-white dark:bg-gray-800 rounded-xl lg:rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden relative transition-colors duration-200 ${
           isShaking ? "animate-[shake_0.5s_ease-in-out]" : ""
         }`}
       >
         <div
-          className={`absolute inset-0 bg-white/90 backdrop-blur-sm z-20 flex flex-col items-center justify-center ${
+          className={`absolute inset-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm z-20 flex flex-col items-center justify-center ${
             isLoading ? "" : "hidden"
           }`}
         >
-          <div className="animate-spin rounded-full h-10 w-10 border-4 border-saffron-100 border-t-saffron-600"></div>
-          <p className="mt-3 text-sm text-saffron-800 font-medium animate-pulse">
+          <div className="animate-spin rounded-full h-10 w-10 border-4 border-saffron-100 dark:border-gray-700 border-t-saffron-600 dark:border-t-saffron-500"></div>
+          <p className="mt-3 text-sm text-saffron-800 dark:text-saffron-300 font-medium animate-pulse">
             Verifying credentials...
           </p>
         </div>
 
-        <RoleSelector
-          currentRole={currentRole}
-          currentLang={currentLang}
-          onRoleChange={onRoleChange}
-        />
+        <div className="px-6 lg:px-6 xl:px-7 pt-6 lg:pt-7 xl:pt-8">
+          <RoleSelector
+            currentRole={currentRole}
+            currentLang={currentLang}
+            onRoleChange={onRoleChange}
+          />
+        </div>
 
-        <div className="p-6 md:p-8 pt-4">
-          <div className="mb-6">
-            <h2 className="text-2xl font-serif font-bold text-gray-900">
+        <div className="p-6 md:p-7 lg:p-8 xl:p-9 pt-4 lg:pt-5 xl:pt-6">
+          <div className="mb-6 lg:mb-7 xl:mb-8">
+            <h2 className="text-2xl lg:text-2xl xl:text-3xl font-serif font-bold text-gray-900 dark:text-gray-100">
               {t.signIn}
             </h2>
             <p
-              className="text-sm text-gray-500 mt-1 transition-opacity duration-300"
+              className="text-sm lg:text-sm xl:text-base text-gray-500 dark:text-gray-400 mt-2 lg:mt-2 transition-opacity duration-300"
               style={{ opacity: 1 }}
             >
               {roleData[currentLang].helper}
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-            <div className="space-y-1">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-5 lg:space-y-5 xl:space-y-6"
+            noValidate
+          >
+            <div className="space-y-2 lg:space-y-3">
               <label
                 htmlFor="userId"
-                className="block text-xs font-semibold text-gray-700 uppercase tracking-wide"
+                className="block text-xs lg:text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide"
               >
                 {t.labelUserId}
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 dark:text-gray-500">
                   <i className="ph ph-user text-lg"></i>
                 </div>
                 <input
@@ -166,10 +178,10 @@ function LoginForm({
                   value={userId}
                   onChange={handleUserIdChange}
                   required
-                  className={`block w-full pl-10 pr-3 py-3 border rounded-lg text-gray-900 placeholder-gray-400 focus:ring-saffron-500 focus:border-saffron-500 sm:text-sm transition-colors ${
+                  className={`block w-full pl-10 pr-3 py-2.5 lg:py-3 border rounded-lg text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-saffron-500 focus:border-saffron-500 dark:focus:border-saffron-500 text-sm transition-colors ${
                     userIdError
-                      ? "border-red-500 focus:ring-red-500"
-                      : "border-gray-300"
+                      ? "border-red-500 dark:border-red-400 focus:ring-red-500"
+                      : "border-gray-300 dark:border-gray-600"
                   }`}
                   placeholder={roleData[currentLang].placeholder}
                 />
@@ -179,15 +191,15 @@ function LoginForm({
               )}
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-2 lg:space-y-3">
               <label
                 htmlFor="password"
-                className="block text-xs font-semibold text-gray-700 uppercase tracking-wide"
+                className="block text-xs lg:text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide"
               >
                 {t.labelPassword}
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 dark:text-gray-500">
                   <i className="ph ph-lock-key text-lg"></i>
                 </div>
                 <input
@@ -198,21 +210,23 @@ function LoginForm({
                   onChange={handlePasswordChange}
                   required
                   minLength={8}
-                  className={`block w-full pl-10 pr-10 py-3 border rounded-lg text-gray-900 placeholder-gray-400 focus:ring-saffron-500 focus:border-saffron-500 sm:text-sm transition-colors ${
+                  className={`block w-full pl-10 pr-10 py-2.5 lg:py-3 border rounded-lg text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-400 dark:placeholder-gray-500 focus:ring-saffron-500 focus:border-saffron-500 dark:focus:border-saffron-500 text-sm transition-colors ${
                     passwordError
-                      ? "border-red-500 focus:ring-red-500"
-                      : "border-gray-300"
+                      ? "border-red-500 dark:border-red-400 focus:ring-red-500"
+                      : "border-gray-300 dark:border-gray-600"
                   }`}
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 cursor-pointer"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer"
                 >
                   <i
                     className={`ph ${
-                      showPassword ? "ph-eye text-saffron-600" : "ph-eye-slash"
+                      showPassword
+                        ? "ph-eye text-saffron-600 dark:text-saffron-400"
+                        : "ph-eye-slash"
                     } text-lg`}
                   ></i>
                 </button>
@@ -259,20 +273,20 @@ function LoginForm({
 
             <button
               type="submit"
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-saffron-600 hover:bg-saffron-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-saffron-500 transition-transform transform active:scale-95"
+              className="w-full flex justify-center py-2.5 lg:py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-saffron-600 hover:bg-saffron-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-saffron-500 transition-transform transform active:scale-95"
             >
               {t.loginBtn}
             </button>
           </form>
         </div>
 
-        <div className="bg-gray-50 px-6 py-4 border-t border-gray-100 text-center">
-          <p className="text-xs text-gray-500">
+        <div className="bg-gray-50 dark:bg-gray-900/50 px-6 lg:px-7 xl:px-8 py-4 lg:py-5 xl:py-6 border-t border-gray-100 dark:border-gray-700 text-center transition-colors duration-200">
+          <p className="text-xs lg:text-sm text-gray-500 dark:text-gray-400">
             <span>{t.newHere}</span>{" "}
             <button
               type="button"
               onClick={onShowRegistration}
-              className="font-medium text-saffron-600 hover:text-saffron-500"
+              className="font-medium text-saffron-600 dark:text-saffron-400 hover:text-saffron-500 dark:hover:text-saffron-300"
             >
               {t.registerLink}
             </button>
@@ -280,7 +294,7 @@ function LoginForm({
         </div>
       </div>
 
-      <div className="mt-6 text-center text-xs text-gray-400 flex items-center justify-center gap-1">
+      <div className="mt-6 lg:mt-7 xl:mt-8 text-center text-xs text-gray-400 flex items-center justify-center gap-1">
         <i className="ph-fill ph-lock-key"></i>
         <span>256-bit SSL Encrypted Connection</span>
       </div>

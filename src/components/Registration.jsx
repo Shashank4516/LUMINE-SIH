@@ -2,7 +2,7 @@ import { useState } from "react";
 import { TRANSLATIONS } from "../constants/translations";
 import { registerUser } from "../services/firebaseAuth";
 
-function Registration({ currentLang, onBackToLogin }) {
+function Registration({ currentLang, onBackToLogin, onRegistrationSuccess }) {
   const [formData, setFormData] = useState({
     fullName: "",
     phoneNumber: "",
@@ -20,6 +20,8 @@ function Registration({ currentLang, onBackToLogin }) {
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
 
   const t = TRANSLATIONS[currentLang];
+
+  // Removed useEffect - redirect is now handled directly in handleSubmit
 
   const validateForm = () => {
     const newErrors = {};
@@ -74,29 +76,38 @@ function Registration({ currentLang, onBackToLogin }) {
     setGlobalError("");
 
     try {
-      console.log('Starting registration...');
+      console.log("Starting registration with Firebase...");
+
+      // Register via Firebase
       const result = await registerUser(
         formData.email.trim(),
         formData.password,
         formData.fullName.trim(),
         formData.phoneNumber.trim(),
-        'devotee' // All registrations are for devotees
+        "devotee"
       );
 
-      console.log('Registration successful:', result);
+      console.log("Registration successful:", result);
 
-      // Store token and user data (only if token is valid)
-      if (result.token && result.token !== 'pending') {
-        localStorage.setItem('lumine_token', result.token);
-      }
-      localStorage.setItem('lumine_user', JSON.stringify(result.user));
+      // Save user data to localStorage
+      localStorage.setItem("lumine_user", JSON.stringify(result.user));
+      localStorage.setItem("lumine_just_registered", "true");
 
-      // Set success state immediately after registration
-      console.log('Setting registration success...');
-      setRegistrationSuccess(true);
+      // Show success briefly then redirect
       setIsLoading(false);
+      setRegistrationSuccess(true);
+
+      // Redirect after 1 second
+      setTimeout(() => {
+        console.log("Redirecting to slot booking...");
+        if (onRegistrationSuccess) {
+          onRegistrationSuccess();
+        } else {
+          window.location.reload();
+        }
+      }, 1000);
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error("Registration error:", error);
       handleError(error);
       setIsLoading(false);
     }
@@ -139,16 +150,13 @@ function Registration({ currentLang, onBackToLogin }) {
                     {t.registrationSuccess}
                   </p>
                   <p className="text-sm text-green-700">
-                    {t.registrationSuccessDesc}
+                    Redirecting to slot booking...
                   </p>
                 </div>
               </div>
-              <button
-                onClick={onBackToLogin}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-saffron-600 hover:bg-saffron-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-saffron-500 transition-transform transform active:scale-95"
-              >
-                {t.loginLink}
-              </button>
+              <div className="flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-4 border-saffron-100 border-t-saffron-600"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -159,40 +167,42 @@ function Registration({ currentLang, onBackToLogin }) {
   return (
     <div className="w-full max-w-md mx-auto lg:mx-0">
       <div className="lg:hidden text-center mb-8 space-y-2">
-        <h1 className="font-serif text-3xl font-bold text-gray-900">
+        <h1 className="font-serif text-3xl font-bold text-gray-900 dark:text-gray-100">
           <span>{t.welcomeMain}</span>{" "}
-          <span className="text-saffron-600">{t.welcomeSub}</span>
+          <span className="text-saffron-600 dark:text-saffron-400">
+            {t.welcomeSub}
+          </span>
         </h1>
       </div>
       <div
-        className={`bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden relative ${
+        className={`bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden relative transition-colors duration-200 ${
           isShaking ? "animate-[shake_0.5s_ease-in-out]" : ""
         }`}
       >
-        <div
-          className={`absolute inset-0 bg-white/90 backdrop-blur-sm z-20 flex flex-col items-center justify-center ${
-            isLoading ? "" : "hidden"
-          }`}
-        >
-          <div className="animate-spin rounded-full h-10 w-10 border-4 border-saffron-100 border-t-saffron-600"></div>
-          <p className="mt-3 text-sm text-saffron-800 font-medium animate-pulse">
-            Creating your account...
-          </p>
-        </div>
+        {isLoading && !registrationSuccess && (
+          <div className="absolute inset-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm z-20 flex flex-col items-center justify-center">
+            <div className="animate-spin rounded-full h-10 w-10 border-4 border-saffron-100 dark:border-gray-700 border-t-saffron-600 dark:border-t-saffron-500"></div>
+            <p className="mt-3 text-sm text-saffron-800 dark:text-saffron-300 font-medium animate-pulse">
+              Creating your account...
+            </p>
+          </div>
+        )}
 
         <div className="p-6 md:p-8 pt-4">
           <div className="mb-6">
             <button
               onClick={onBackToLogin}
-              className="mb-4 flex items-center gap-2 text-sm text-saffron-600 hover:text-saffron-700 font-medium transition-colors"
+              className="mb-4 flex items-center gap-2 text-sm text-saffron-600 dark:text-saffron-400 hover:text-saffron-700 dark:hover:text-saffron-300 font-medium transition-colors"
             >
               <i className="ph ph-arrow-left text-lg"></i>
               <span>{t.backToLogin}</span>
             </button>
-            <h2 className="text-2xl font-serif font-bold text-gray-900">
+            <h2 className="text-2xl font-serif font-bold text-gray-900 dark:text-gray-100">
               {t.registerTitle}
             </h2>
-            <p className="text-sm text-gray-500 mt-1">{t.registerSubtitle}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              {t.registerSubtitle}
+            </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5" noValidate>
@@ -374,9 +384,7 @@ function Registration({ currentLang, onBackToLogin }) {
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="text-red-500 text-xs">
-                  {errors.confirmPassword}
-                </p>
+                <p className="text-red-500 text-xs">{errors.confirmPassword}</p>
               )}
             </div>
 
@@ -398,7 +406,9 @@ function Registration({ currentLang, onBackToLogin }) {
                 </label>
               </div>
               {errors.acceptTerms && (
-                <p className="text-red-500 text-xs ml-6">{errors.acceptTerms}</p>
+                <p className="text-red-500 text-xs ml-6">
+                  {errors.acceptTerms}
+                </p>
               )}
             </div>
 
@@ -418,12 +428,12 @@ function Registration({ currentLang, onBackToLogin }) {
           </form>
         </div>
 
-        <div className="bg-gray-50 px-6 py-4 border-t border-gray-100 text-center">
-          <p className="text-xs text-gray-500">
+        <div className="bg-gray-50 dark:bg-gray-900/50 px-6 py-4 border-t border-gray-100 dark:border-gray-700 text-center transition-colors duration-200">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
             <span>{t.alreadyHaveAccount}</span>{" "}
             <button
               onClick={onBackToLogin}
-              className="font-medium text-saffron-600 hover:text-saffron-500"
+              className="font-medium text-saffron-600 dark:text-saffron-400 hover:text-saffron-500 dark:hover:text-saffron-300"
             >
               {t.loginLink}
             </button>
@@ -440,4 +450,3 @@ function Registration({ currentLang, onBackToLogin }) {
 }
 
 export default Registration;
-
