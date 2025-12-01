@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { TRANSLATIONS, ROLES } from "../constants/translations";
 import RoleSelector from "./RoleSelector";
-import { signInUser } from "../services/firebaseAuth";
+import { signInUser } from "../services/backendAuth";
 
 function LoginForm({
   currentRole,
@@ -55,7 +55,7 @@ function LoginForm({
     setGlobalError("");
 
     try {
-      // Use Firebase authentication
+      // Use backend authentication
       const result = await signInUser(
         userId.trim(),
         password,

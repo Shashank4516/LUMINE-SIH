@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "../config/firebase";
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
 // Generate booking number
 const generateBookingNumber = () => {
@@ -193,7 +194,7 @@ const useSlotBooking = () => {
     }
   };
 
-  // Submit booking to Firebase Firestore
+  // Submit booking to Backend API
   const submitBooking = async () => {
     setIsSubmitting(true);
     setError(null);
@@ -243,7 +244,10 @@ const useSlotBooking = () => {
         return;
       }
 
-      // Get user data (already retrieved above)
+      // Get auth token
+      const token =
+        localStorage.getItem("lumine_token") ||
+        sessionStorage.getItem("lumine_token");
 
       // Generate booking number
       const bookingNumber = generateBookingNumber();
@@ -273,24 +277,39 @@ const useSlotBooking = () => {
           isVerified: member.isVerified || false,
         })),
         status: "confirmed",
-        userId: user?.uid || null,
+        userId: user?.id || null,
         userEmail: user?.email || null,
-        userName: user?.displayName || null,
-        createdAt: serverTimestamp(),
+        userName: user?.displayName || user?.fullName || null,
       };
 
       console.log("Submitting booking:", bookingData);
 
-      // Save to Firebase Firestore
-      const docRef = await addDoc(collection(db, "bookings"), bookingData);
+      // Save to Backend API
+      const response = await fetch(`${API_BASE_URL}/api/bookings`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+        body: JSON.stringify(bookingData),
+      });
 
-      console.log("Booking created with ID:", docRef.id);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error?.message || data.error || "Failed to create booking"
+        );
+      }
+
+      console.log("Booking created:", data);
 
       // Store the booking result
       setBookingResult({
-        id: docRef.id,
+        id: data.id || data.booking?.id || bookingNumber,
         bookingNumber: bookingNumber,
         ...bookingData,
+        createdAt: new Date().toISOString(),
       });
       setShowSuccess(true);
     } catch (err) {

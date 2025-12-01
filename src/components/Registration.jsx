@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { TRANSLATIONS } from "../constants/translations";
-import { registerUser } from "../services/firebaseAuth";
+import { registerUser } from "../services/backendAuth";
 
 function Registration({ currentLang, onBackToLogin, onRegistrationSuccess }) {
   const [formData, setFormData] = useState({
@@ -76,9 +76,9 @@ function Registration({ currentLang, onBackToLogin, onRegistrationSuccess }) {
     setGlobalError("");
 
     try {
-      console.log("Starting registration with Firebase...");
+      console.log("Starting registration with backend...");
 
-      // Register via Firebase
+      // Register via backend API
       const result = await registerUser(
         formData.email.trim(),
         formData.password,

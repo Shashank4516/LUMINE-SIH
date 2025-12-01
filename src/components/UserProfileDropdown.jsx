@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { signOutUser } from "../services/firebaseAuth";
+import { signOutUser } from "../services/backendAuth";
 
 const UserProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
