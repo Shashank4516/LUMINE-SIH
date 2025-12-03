@@ -14,11 +14,13 @@ const SlotBooking = () => {
     currentStep,
     totalSteps,
     temple,
+    selectedTempleId,
     date,
     timeSlot,
     members,
     isSubmitting,
     showSuccess,
+    temples,
     handleTempleChange,
     handleDateChange,
     handleTimeChange,
@@ -44,8 +46,10 @@ const SlotBooking = () => {
             <SlotStep
               isActive={currentStep === 1}
               temple={temple}
+              selectedTempleId={selectedTempleId}
               date={date}
               timeSlot={timeSlot}
+              temples={temples}
               onTempleChange={handleTempleChange}
               onDateChange={handleDateChange}
               onTimeChange={handleTimeChange}

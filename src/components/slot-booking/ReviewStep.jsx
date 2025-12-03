@@ -4,11 +4,7 @@ import logoImage from "../../assets/img/Adobe Express - file (1).png";
 const ReviewStep = ({ isActive, temple, date, timeSlot, memberCount }) => {
   if (!isActive) return null;
 
-  const templeNames = {
-    somnath: "Somnath Temple",
-    dwarka: "Dwarka Temple",
-    nageshwar: "Nageshwar Temple",
-  };
+  // Temple is now the actual temple name from backend, not a key
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "Not selected";
@@ -47,7 +43,7 @@ const ReviewStep = ({ isActive, temple, date, timeSlot, memberCount }) => {
                 Temple
               </p>
               <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                {templeNames[temple] || "Not selected"}
+                {temple || "Not selected"}
               </p>
             </div>
           </div>

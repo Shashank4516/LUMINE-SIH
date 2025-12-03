@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
-
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+import { createBooking, getAllTemples } from "../services/bookingService";
 
 // Generate booking number
 const generateBookingNumber = () => {
@@ -16,8 +14,9 @@ const generateBookingNumber = () => {
 const useSlotBooking = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 3;
-  const [temple, setTemple] = useState("");
-  const [templeId, setTempleId] = useState(null);
+  const [temple, setTemple] = useState(""); // Store temple name for display
+  const [templeId, setTempleId] = useState(null); // Store database ID for submission
+  const [selectedTempleId, setSelectedTempleId] = useState(""); // Store selected ID for select value
   const [date, setDate] = useState("");
   const [timeSlot, setTimeSlot] = useState("");
   const [members, setMembers] = useState([]);
@@ -25,14 +24,91 @@ const useSlotBooking = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [bookingResult, setBookingResult] = useState(null);
   const [error, setError] = useState(null);
+  const [temples, setTemples] = useState([]);
+  const [templeData, setTempleData] = useState({});
 
-  // Temple data mapping (you can also fetch this from API)
-  const templeData = {
-    "Somnath Temple": 1,
-    "Dwarkadhish Temple": 2,
-    "Nageshwar Jyotirlinga": 3,
-    "Rukmini Devi Temple": 4,
-  };
+  // Fetch temples from backend on mount
+  useEffect(() => {
+    const fetchTemples = async () => {
+      try {
+        console.log("Fetching temples from backend...");
+        const response = await getAllTemples();
+        console.log("Temples fetched:", response);
+
+        if (response.temples && Array.isArray(response.temples)) {
+          setTemples(response.temples);
+
+          // Build dynamic mapping from backend data
+          const mapping = {};
+          response.temples.forEach((temple) => {
+            // Map by ID (for direct ID access)
+            mapping[temple.id] = temple.id;
+
+            // Map by name variations for backward compatibility
+            const nameLower = temple.name.toLowerCase();
+            if (nameLower.includes("somnath")) {
+              mapping["somnath"] = temple.id;
+              mapping["Somnath Temple"] = temple.id;
+            }
+            if (
+              nameLower.includes("dwarka") ||
+              nameLower.includes("dwarkadhish")
+            ) {
+              mapping["dwarka"] = temple.id;
+              mapping["Dwarkadhish Temple"] = temple.id;
+              mapping["Dwarka Temple"] = temple.id;
+            }
+            if (nameLower.includes("nageshwar")) {
+              mapping["nageshwar"] = temple.id;
+              mapping["Nageshwar Jyotirlinga"] = temple.id;
+              mapping["Nageshwar Temple"] = temple.id;
+            }
+            if (nameLower.includes("rukmini")) {
+              mapping["Rukmini Devi Temple"] = temple.id;
+            }
+
+            // Also map by exact name
+            mapping[temple.name] = temple.id;
+          });
+
+          console.log("Temple mapping created:", mapping);
+          setTempleData(mapping);
+        }
+      } catch (error) {
+        console.error("Error fetching temples:", error);
+        // Fallback to hardcoded mapping if API fails
+        setTempleData({
+          somnath: 1,
+          dwarka: 2,
+          nageshwar: 3,
+          "Somnath Temple": 1,
+          "Dwarkadhish Temple": 2,
+          "Nageshwar Jyotirlinga": 3,
+          "Rukmini Devi Temple": 4,
+        });
+      }
+    };
+
+    fetchTemples();
+  }, []);
+
+  // Update temple name when temples are loaded and a templeId is set but name is missing
+  useEffect(() => {
+    if (templeId && !temple && temples.length > 0) {
+      const foundTemple = temples.find(
+        (t) => t.id === templeId || Number(t.id) === Number(templeId)
+      );
+      if (foundTemple) {
+        console.log(
+          "✅ Updating temple name for previously selected ID:",
+          templeId,
+          "->",
+          foundTemple.name
+        );
+        setTemple(foundTemple.name);
+      }
+    }
+  }, [temples, templeId, temple]);
 
   // Initialize with the registered user as the first member
   useEffect(() => {
@@ -46,6 +122,7 @@ const useSlotBooking = () => {
             name: user.displayName || user.fullName || "",
             age: "",
             gender: "",
+            email: user.email || "",
             aadhaar: "",
             isVerified: false,
           },
@@ -81,10 +158,69 @@ const useSlotBooking = () => {
     }
   }, []);
 
-  const handleTempleChange = (value) => {
-    setTemple(value);
-    // Set temple ID based on temple name
-    setTempleId(templeData[value] || null);
+  const handleTempleChange = (value, templeNameFromSelect = null) => {
+    console.log(
+      "handleTempleChange called with value:",
+      value,
+      "name:",
+      templeNameFromSelect
+    );
+    console.log("Current temples array:", temples);
+
+    // Value is the database ID directly (number or string)
+    const templeIdNum = value ? Number(value) : null;
+    setSelectedTempleId(value || "");
+
+    if (!templeIdNum) {
+      setTemple("");
+      setTempleId(null);
+      return;
+    }
+
+    // Priority 1: Use the name from the select option (most reliable)
+    if (templeNameFromSelect && templeNameFromSelect !== "Select a temple") {
+      console.log(
+        "✅ Using temple name from select option:",
+        templeNameFromSelect
+      );
+      setTemple(templeNameFromSelect);
+      setTempleId(templeIdNum);
+      return;
+    }
+
+    // Priority 2: Find the temple name from temples array
+    let selectedTemple = temples.find(
+      (t) => t.id === templeIdNum || t.id.toString() === value.toString()
+    );
+
+    // If not found in temples array, try to find by ID with type coercion
+    if (!selectedTemple && temples.length > 0) {
+      selectedTemple = temples.find((t) => Number(t.id) === templeIdNum);
+    }
+
+    if (selectedTemple) {
+      const templeName = selectedTemple.name;
+      console.log("✅ Selected temple from array:", {
+        id: templeIdNum,
+        name: templeName,
+        value: value,
+      });
+
+      // Store both the ID (for backend) and name (for display)
+      setTemple(templeName);
+      setTempleId(templeIdNum);
+    } else {
+      console.warn(
+        "⚠️ Temple not found for ID:",
+        templeIdNum,
+        "in temples:",
+        temples
+      );
+      // Even if not found, store the ID so we can look it up later
+      setTempleId(templeIdNum);
+      // Set empty name - will be updated when temples load or on next selection
+      setTemple("");
+    }
   };
 
   const handleDateChange = (value) => {
@@ -196,10 +332,35 @@ const useSlotBooking = () => {
 
   // Submit booking to Backend API
   const submitBooking = async () => {
+    console.log("submitBooking called");
     setIsSubmitting(true);
     setError(null);
 
     try {
+      // Validate member names first
+      const nameErrors = {};
+      let hasNameErrors = false;
+
+      members.forEach((member, index) => {
+        const memberName = member.name?.trim();
+        if (!memberName || memberName === "") {
+          nameErrors[member.id] = "Name is required";
+          hasNameErrors = true;
+        }
+      });
+
+      if (hasNameErrors) {
+        setMembers(
+          members.map((member) => ({
+            ...member,
+            nameError: nameErrors[member.id] || "",
+          }))
+        );
+        setError("Please fill in all member names before submitting");
+        setIsSubmitting(false);
+        return;
+      }
+
       // Validate all members have unique emails (skip primary member - index 0)
       const emailSet = new Set();
       const emailErrors = {};
@@ -244,78 +405,203 @@ const useSlotBooking = () => {
         return;
       }
 
-      // Get auth token
-      const token =
-        localStorage.getItem("lumine_token") ||
-        sessionStorage.getItem("lumine_token");
-
       // Generate booking number
       const bookingNumber = generateBookingNumber();
 
-      // Prepare booking data
+      // Validate required fields - templeId should be set directly from selection
+      let finalTempleId = templeId;
+
+      // If templeId is not set but temple name is, try to find it
+      if (!finalTempleId && temple) {
+        const matchedTemple = temples.find(
+          (t) =>
+            t.name.toLowerCase() === temple.toLowerCase() ||
+            t.name.toLowerCase().includes(temple.toLowerCase()) ||
+            temple.toLowerCase().includes(t.name.toLowerCase().split(" ")[0])
+        );
+        if (matchedTemple) {
+          finalTempleId = matchedTemple.id;
+          console.log(
+            `Found temple by name: ${matchedTemple.name} (ID: ${matchedTemple.id})`
+          );
+          setTempleId(matchedTemple.id);
+        }
+      }
+
+      console.log(
+        "🔍 Validation check - temple:",
+        temple,
+        "templeId:",
+        templeId,
+        "finalTempleId:",
+        finalTempleId,
+        "available temples:",
+        temples.map((t) => ({ id: t.id, name: t.name }))
+      );
+
+      if (!finalTempleId || !temple) {
+        const errorMsg = `Please select a temple. Available temples: ${temples
+          .map((t) => t.name)
+          .join(", ")}`;
+        console.error("❌ Temple validation failed:", {
+          temple,
+          templeId,
+          finalTempleId,
+        });
+        setError(errorMsg);
+        setIsSubmitting(false);
+        alert(errorMsg);
+        return;
+      }
+
+      // Ensure finalTempleId is a number
+      finalTempleId = Number(finalTempleId);
+      if (isNaN(finalTempleId) || finalTempleId <= 0) {
+        const errorMsg = `Invalid temple ID: ${finalTempleId}. Please select a temple again.`;
+        console.error("❌ Invalid temple ID:", finalTempleId);
+        setError(errorMsg);
+        setIsSubmitting(false);
+        alert(errorMsg);
+        return;
+      }
+
+      if (!user?.id) {
+        setError("User information not found. Please log in again.");
+        setIsSubmitting(false);
+        alert("User information not found. Please log in again.");
+        return;
+      }
+
+      if (!date) {
+        setError("Please select a date");
+        setIsSubmitting(false);
+        alert("Please select a date before confirming your booking.");
+        return;
+      }
+
+      if (!timeSlot) {
+        setError("Please select a time slot");
+        setIsSubmitting(false);
+        alert("Please select a time slot before confirming your booking.");
+        return;
+      }
+
+      // Validate members array is not empty
+      if (!members || members.length === 0) {
+        setError("At least one member is required");
+        setIsSubmitting(false);
+        alert("At least one member is required for booking.");
+        return;
+      }
+
+      // Prepare booking data with proper type conversion
       const bookingData = {
         bookingNumber: bookingNumber,
-        templeName: temple,
-        templeId: templeId,
+        templeId: finalTempleId, // Already validated as a number
         bookingDate: date,
         timeSlot: timeSlot,
         totalMembers: members.length,
-        members: members.map((member, index) => ({
-          name: member.name,
-          age: member.age ? parseInt(member.age) : null,
-          gender: member.gender || null,
-          // Primary member (index 0) uses user's email, others use their own email
-          email:
+        userId: Number(user.id), // Ensure it's a number
+        members: members.map((member, index) => {
+          // Parse age properly - only include if it's a valid number
+          let parsedAge = undefined;
+          if (member.age && member.age.toString().trim() !== "") {
+            const ageNum = parseInt(member.age);
+            if (!isNaN(ageNum) && ageNum > 0) {
+              parsedAge = ageNum;
+            }
+          }
+
+          // Build member object, only including defined values
+          const memberObj = {
+            name: member.name || "",
+          };
+
+          // Only add age if it's a valid number
+          if (parsedAge !== undefined) {
+            memberObj.age = parsedAge;
+          }
+
+          // Add optional fields only if they have values
+          if (member.gender && member.gender.trim() !== "") {
+            memberObj.gender = member.gender;
+          }
+
+          // Handle email - use empty string for primary member if no email, or member email
+          const memberEmail =
             index === 0
               ? user?.email
                 ? user.email.trim().toLowerCase()
-                : null
+                : ""
               : member.email
               ? member.email.trim().toLowerCase()
-              : null,
-          aadhaar: member.aadhaar || null,
-          isVerified: member.isVerified || false,
-        })),
-        status: "confirmed",
-        userId: user?.id || null,
-        userEmail: user?.email || null,
-        userName: user?.displayName || user?.fullName || null,
+              : "";
+
+          memberObj.email = memberEmail;
+
+          if (member.aadhaar && member.aadhaar.trim() !== "") {
+            memberObj.aadhaar = member.aadhaar;
+          }
+
+          if (member.isVerified !== undefined) {
+            memberObj.isVerified = member.isVerified;
+          }
+
+          return memberObj;
+        }),
       };
 
-      console.log("Submitting booking:", bookingData);
+      console.log("📤 Submitting booking:", bookingData);
+      console.log("📋 Booking Details:");
+      console.log(
+        "   - Temple ID:",
+        finalTempleId,
+        "(type:",
+        typeof finalTempleId,
+        ")"
+      );
+      console.log("   - Temple Name:", temple);
+      console.log("   - User ID:", user.id, "(type:", typeof user.id, ")");
+      console.log("   - Date:", date);
+      console.log("   - Time Slot:", timeSlot);
+      console.log("   - Total Members:", members.length);
+      console.log("   - Booking Number:", bookingNumber);
 
-      // Save to Backend API
-      const response = await fetch(`${API_BASE_URL}/api/bookings`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-        body: JSON.stringify(bookingData),
-      });
+      // Save to Backend API using bookingService
+      console.log("📤 Sending booking data to backend...");
+      const result = await createBooking(bookingData);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.error?.message || data.error || "Failed to create booking"
-        );
-      }
-
-      console.log("Booking created:", data);
+      console.log("✅ Booking created:", result);
+      console.log("✅ Booking ID:", result.booking?.id);
+      console.log(
+        "✅ Booking Number:",
+        result.booking?.bookingNumber || bookingNumber
+      );
+      console.log("✅ Data has been saved to PostgreSQL database (pgAdmin)");
 
       // Store the booking result
       setBookingResult({
-        id: data.id || data.booking?.id || bookingNumber,
-        bookingNumber: bookingNumber,
+        id: result.booking?.id || bookingNumber,
+        bookingNumber: result.booking?.bookingNumber || bookingNumber,
         ...bookingData,
         createdAt: new Date().toISOString(),
       });
       setShowSuccess(true);
+
+      console.log("✅ Success overlay displayed - Booking confirmed!");
     } catch (err) {
       console.error("Booking error:", err);
-      setError(err.message || "Failed to create booking. Please try again.");
-      alert(err.message || "Failed to create booking. Please try again.");
+      const errorMessage =
+        err.message || "Failed to create booking. Please try again.";
+      setError(errorMessage);
+
+      // Show detailed error in alert
+      alert(errorMessage);
+
+      // Also log the full error for debugging
+      if (err.response) {
+        console.error("Full error response:", err.response);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -326,6 +612,7 @@ const useSlotBooking = () => {
     setCurrentStep(1);
     setTemple("");
     setTempleId(null);
+    setSelectedTempleId("");
     setDate("");
     setTimeSlot("");
     setShowSuccess(false);
@@ -343,6 +630,7 @@ const useSlotBooking = () => {
             name: user.displayName || user.fullName || "",
             age: "",
             gender: "",
+            email: user.email || "",
             aadhaar: "",
             isVerified: false,
           },
@@ -368,6 +656,7 @@ const useSlotBooking = () => {
     totalSteps,
     temple,
     templeId,
+    selectedTempleId, // Export for select value binding
     date,
     timeSlot,
     members,
@@ -375,6 +664,7 @@ const useSlotBooking = () => {
     showSuccess,
     bookingResult,
     error,
+    temples, // Export temples for use in components
     handleTempleChange,
     handleDateChange,
     handleTimeChange,

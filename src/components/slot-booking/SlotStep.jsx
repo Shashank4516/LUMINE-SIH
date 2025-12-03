@@ -3,19 +3,31 @@ import React from "react";
 const SlotStep = ({
   isActive,
   temple,
+  selectedTempleId = "",
   date,
   timeSlot,
+  temples: fetchedTemples = [],
   onTempleChange,
   onDateChange,
   onTimeChange,
 }) => {
   if (!isActive) return null;
 
-  const temples = [
-    { id: "somnath", name: "Somnath Temple" },
-    { id: "dwarka", name: "Dwarka Temple" },
-    { id: "nageshwar", name: "Nageshwar Temple" },
-  ];
+  // Use fetched temples from backend, or fallback to hardcoded list
+  // IMPORTANT: Use database ID directly as the value
+  const temples =
+    fetchedTemples.length > 0
+      ? fetchedTemples.map((t) => ({
+          id: t.id, // Use database ID directly
+          name: t.name,
+        }))
+      : [
+          // Fallback with hardcoded IDs (these should match database)
+          { id: 1, name: "Somnath Temple" },
+          { id: 2, name: "Dwarkadhish Temple" },
+          { id: 3, name: "Nageshwar Jyotirlinga" },
+          { id: 4, name: "Rukmini Devi Temple" },
+        ];
 
   const timeSlots = [
     "06:00 AM - 08:00 AM",
@@ -48,8 +60,14 @@ const SlotStep = ({
             Temple
           </label>
           <select
-            value={temple}
-            onChange={(e) => onTempleChange(e.target.value)}
+            value={selectedTempleId}
+            onChange={(e) => {
+              const selectedValue = e.target.value;
+              const selectedOption = e.target.options[e.target.selectedIndex];
+              const templeName = selectedOption ? selectedOption.text : "";
+              // Pass both ID and name to ensure we have the name even if temples array isn't loaded
+              onTempleChange(selectedValue, templeName);
+            }}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-saffron-500 focus:border-saffron-500 text-gray-900"
           >
             <option value="">Select a temple</option>

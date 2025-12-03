@@ -29,8 +29,18 @@ const FormNav = ({
 
       {isLastStep ? (
         <button
-          onClick={onSubmit}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log("Confirm button clicked");
+            if (onSubmit) {
+              onSubmit();
+            } else {
+              console.error("onSubmit is not defined");
+            }
+          }}
           disabled={isSubmitting}
+          type="button"
           className="px-6 md:px-8 py-2.5 bg-saffron-600 text-white rounded-lg font-semibold hover:bg-saffron-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm"
         >
           {isSubmitting ? (
