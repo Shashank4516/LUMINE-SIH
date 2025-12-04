@@ -32,12 +32,8 @@ function LoginForm({
     setPasswordError("");
     setGlobalError("");
 
-    const errId =
-      currentLang === "en" ? "User ID is required." : "यूज़र आईडी आवश्यक है।";
-    const errPass =
-      currentLang === "en"
-        ? "Password must be at least 8 chars."
-        : "पासवर्ड कम से कम 8 अक्षर का होना चाहिए।";
+    const errId = t.userIdRequired;
+    const errPass = t.passwordMinLength;
 
     if (!userId.trim()) {
       setUserIdError(errId);

@@ -2,7 +2,8 @@ export const TRANSLATIONS = {
   en: {
     welcomeMain: "Welcome —",
     welcomeSub: "स्वागत है",
-    heroSubtitle: "Seva, Darshan & Management — one dashboard for the entire mandir ecosystem.",
+    heroSubtitle:
+      "Seva, Darshan & Management — one dashboard for the entire mandir ecosystem.",
     card1Title: "Devotee Services",
     card1Desc: "Book poojas & donate instantly.",
     card2Title: "Secure Access",
@@ -16,11 +17,13 @@ export const TRANSLATIONS = {
     newHere: "New here?",
     registerLink: "Register as Devotee",
     forgotPasswordTitle: "Reset Password",
-    forgotPasswordSubtitle: "Enter your email or user ID to receive reset instructions.",
+    forgotPasswordSubtitle:
+      "Enter your email or user ID to receive reset instructions.",
     sendResetLink: "Send Reset Link",
     backToLogin: "Back to Login",
     resetEmailSent: "Reset link sent!",
-    resetEmailSentDesc: "Please check your email for password reset instructions.",
+    resetEmailSentDesc:
+      "Please check your email for password reset instructions.",
     enterOtp: "Enter OTP",
     otpSent: "OTP sent to your registered email/phone",
     verifyOtp: "Verify OTP",
@@ -28,11 +31,13 @@ export const TRANSLATIONS = {
     confirmPassword: "Confirm Password",
     resetPassword: "Reset Password",
     passwordResetSuccess: "Password reset successful!",
-    passwordResetSuccessDesc: "Your password has been reset. You can now login with your new password.",
+    passwordResetSuccessDesc:
+      "Your password has been reset. You can now login with your new password.",
     resendOtp: "Resend OTP",
     otpLabel: "OTP Code",
     registerTitle: "Register as Devotee",
-    registerSubtitle: "Create your account to book poojas, darshan slots, and make donations.",
+    registerSubtitle:
+      "Create your account to book poojas, darshan slots, and make donations.",
     fullName: "Full Name",
     phoneNumber: "Phone Number",
     email: "Email Address",
@@ -41,7 +46,8 @@ export const TRANSLATIONS = {
     alreadyHaveAccount: "Already have an account?",
     loginLink: "Sign In",
     registrationSuccess: "Registration Successful!",
-    registrationSuccessDesc: "Your account has been created. You can now login with your credentials.",
+    registrationSuccessDesc:
+      "Your account has been created. You can now login with your credentials.",
     acceptTerms: "I accept the Terms & Conditions",
     termsRequired: "You must accept the terms and conditions.",
     nameRequired: "Full name is required.",
@@ -49,12 +55,19 @@ export const TRANSLATIONS = {
     emailRequired: "Email address is required.",
     invalidEmail: "Please enter a valid email address.",
     passwordMismatch: "Passwords do not match.",
-    phoneInvalid: "Please enter a valid 10-digit phone number."
+    phoneInvalid: "Please enter a valid 10-digit phone number.",
+    userIdRequired: "User ID is required.",
+    passwordMinLength: "Password must be at least 8 characters.",
+    userIdOrEmailRequired: "User ID or Email is required.",
+    emailRequiredForReset: "Please enter your email address to reset password.",
+    invalidOtp: "Invalid OTP.",
+    otpRequired: "Please enter a valid 6-digit OTP.",
   },
   hi: {
     welcomeMain: "स्वागत है —",
     welcomeSub: "Welcome",
-    heroSubtitle: "सेवा, दर्शन और प्रबंधन — पूरे मंदिर पारिस्थितिकी तंत्र के लिए एक डैशबोर्ड।",
+    heroSubtitle:
+      "सेवा, दर्शन और प्रबंधन — पूरे मंदिर पारिस्थितिकी तंत्र के लिए एक डैशबोर्ड।",
     card1Title: "भक्त सेवाएँ",
     card1Desc: "पूजा बुक करें और तुरंत दान करें।",
     card2Title: "सुरक्षित प्रवेश",
@@ -68,11 +81,13 @@ export const TRANSLATIONS = {
     newHere: "नए हैं?",
     registerLink: "भक्त के रूप में पंजीकरण करें",
     forgotPasswordTitle: "पासवर्ड रीसेट करें",
-    forgotPasswordSubtitle: "रीसेट निर्देश प्राप्त करने के लिए अपना ईमेल या यूज़र आईडी दर्ज करें।",
+    forgotPasswordSubtitle:
+      "रीसेट निर्देश प्राप्त करने के लिए अपना ईमेल या यूज़र आईडी दर्ज करें।",
     sendResetLink: "रीसेट लिंक भेजें",
     backToLogin: "लॉगिन पर वापस जाएं",
     resetEmailSent: "रीसेट लिंक भेजा गया!",
-    resetEmailSentDesc: "कृपया पासवर्ड रीसेट निर्देशों के लिए अपना ईमेल जांचें।",
+    resetEmailSentDesc:
+      "कृपया पासवर्ड रीसेट निर्देशों के लिए अपना ईमेल जांचें।",
     enterOtp: "OTP दर्ज करें",
     otpSent: "OTP आपके पंजीकृत ईमेल/फोन पर भेजा गया",
     verifyOtp: "OTP सत्यापित करें",
@@ -80,11 +95,13 @@ export const TRANSLATIONS = {
     confirmPassword: "पासवर्ड की पुष्टि करें",
     resetPassword: "पासवर्ड रीसेट करें",
     passwordResetSuccess: "पासवर्ड रीसेट सफल!",
-    passwordResetSuccessDesc: "आपका पासवर्ड रीसेट कर दिया गया है। अब आप अपने नए पासवर्ड से लॉगिन कर सकते हैं।",
+    passwordResetSuccessDesc:
+      "आपका पासवर्ड रीसेट कर दिया गया है। अब आप अपने नए पासवर्ड से लॉगिन कर सकते हैं।",
     resendOtp: "OTP पुनः भेजें",
     otpLabel: "OTP कोड",
     registerTitle: "भक्त के रूप में पंजीकरण करें",
-    registerSubtitle: "पूजा, दर्शन स्लॉट बुक करने और दान करने के लिए अपना खाता बनाएं।",
+    registerSubtitle:
+      "पूजा, दर्शन स्लॉट बुक करने और दान करने के लिए अपना खाता बनाएं।",
     fullName: "पूरा नाम",
     phoneNumber: "फोन नंबर",
     email: "ईमेल पता",
@@ -93,7 +110,8 @@ export const TRANSLATIONS = {
     alreadyHaveAccount: "पहले से खाता है?",
     loginLink: "लॉग इन करें",
     registrationSuccess: "पंजीकरण सफल!",
-    registrationSuccessDesc: "आपका खाता बनाया गया है। अब आप अपने क्रेडेंशियल्स के साथ लॉगिन कर सकते हैं।",
+    registrationSuccessDesc:
+      "आपका खाता बनाया गया है। अब आप अपने क्रेडेंशियल्स के साथ लॉगिन कर सकते हैं।",
     acceptTerms: "मैं नियम और शर्तें स्वीकार करता हूं",
     termsRequired: "आपको नियम और शर्तें स्वीकार करनी होंगी।",
     nameRequired: "पूरा नाम आवश्यक है।",
@@ -101,70 +119,162 @@ export const TRANSLATIONS = {
     emailRequired: "ईमेल पता आवश्यक है।",
     invalidEmail: "कृपया एक वैध ईमेल पता दर्ज करें।",
     passwordMismatch: "पासवर्ड मेल नहीं खाते।",
-    phoneInvalid: "कृपया एक वैध 10-अंकीय फोन नंबर दर्ज करें।"
-  }
+    phoneInvalid: "कृपया एक वैध 10-अंकीय फोन नंबर दर्ज करें।",
+    userIdRequired: "यूज़र आईडी आवश्यक है।",
+    passwordMinLength: "पासवर्ड कम से कम 8 अक्षर का होना चाहिए।",
+    userIdOrEmailRequired: "यूज़र आईडी या ईमेल आवश्यक है।",
+    emailRequiredForReset:
+      "पासवर्ड रीसेट करने के लिए कृपया अपना ईमेल पता दर्ज करें।",
+    invalidOtp: "अमान्य OTP।",
+    otpRequired: "कृपया वैध 6-अंकीय OTP दर्ज करें।",
+  },
+  gu: {
+    welcomeMain: "સ્વાગત છે —",
+    welcomeSub: "Welcome",
+    heroSubtitle:
+      "સેવા, દર્શન અને વ્યવસ્થાપન — સંપૂર્ણ મંદિર ઇકોસિસ્ટમ માટે એક ડેશબોર્ડ.",
+    card1Title: "ભક્ત સેવાઓ",
+    card1Desc: "પૂજા બુક કરો અને તરત જ દાન કરો.",
+    card2Title: "સુરક્ષિત પ્રવેશ",
+    card2Desc: "સ્ટાફ માટે ભૂમિકા-આધારિત લૉગિન.",
+    signIn: "સાઇન ઇન કરો",
+    labelUserId: "યુઝર આઈડી / ઇમેઇલ",
+    labelPassword: "પાસવર્ડ",
+    rememberMe: "મને યાદ રાખો",
+    forgotPass: "પાસવર્ડ ભૂલી ગયા છો?",
+    loginBtn: "સુરક્ષિત લૉગિન",
+    newHere: "નવા છો?",
+    registerLink: "ભક્ત તરીકે નોંધણી કરો",
+    forgotPasswordTitle: "પાસવર્ડ રીસેટ કરો",
+    forgotPasswordSubtitle:
+      "રીસેટ સૂચનાઓ મેળવવા માટે તમારું ઇમેઇલ અથવા યુઝર આઈડી દાખલ કરો.",
+    sendResetLink: "રીસેટ લિંક મોકલો",
+    backToLogin: "લૉગિન પર પાછા જાઓ",
+    resetEmailSent: "રીસેટ લિંક મોકલ્યો!",
+    resetEmailSentDesc:
+      "કૃપા કરીને પાસવર્ડ રીસેટ સૂચનાઓ માટે તમારું ઇમેઇલ તપાસો.",
+    enterOtp: "OTP દાખલ કરો",
+    otpSent: "OTP તમારા નોંધાયેલા ઇમેઇલ/ફોન પર મોકલ્યો",
+    verifyOtp: "OTP ચકાસો",
+    newPassword: "નવું પાસવર્ડ",
+    confirmPassword: "પાસવર્ડની પુષ્ટિ કરો",
+    resetPassword: "પાસવર્ડ રીસેટ કરો",
+    passwordResetSuccess: "પાસવર્ડ રીસેટ સફળ!",
+    passwordResetSuccessDesc:
+      "તમારું પાસવર્ડ રીસેટ કરી દેવામાં આવ્યું છે. હવે તમે તમારા નવા પાસવર્ડ સાથે લૉગિન કરી શકો છો.",
+    resendOtp: "OTP ફરીથી મોકલો",
+    otpLabel: "OTP કોડ",
+    registerTitle: "ભક્ત તરીકે નોંધણી કરો",
+    registerSubtitle:
+      "પૂજા, દર્શન સ્લોટ બુક કરવા અને દાન કરવા માટે તમારું એકાઉન્ટ બનાવો.",
+    fullName: "પૂરું નામ",
+    phoneNumber: "ફોન નંબર",
+    email: "ઇમેઇલ સરનામું",
+    confirmPassword: "પાસવર્ડની પુષ્ટિ કરો",
+    registerBtn: "એકાઉન્ટ બનાવો",
+    alreadyHaveAccount: "પહેલેથી એકાઉન્ટ છે?",
+    loginLink: "સાઇન ઇન કરો",
+    registrationSuccess: "નોંધણી સફળ!",
+    registrationSuccessDesc:
+      "તમારું એકાઉન્ટ બનાવી દેવામાં આવ્યું છે. હવે તમે તમારી ક્રેડેન્શિયલ્સ સાથે લૉગિન કરી શકો છો.",
+    acceptTerms: "હું શરતો અને નિયમો સ્વીકારું છું",
+    termsRequired: "તમારે શરતો અને નિયમો સ્વીકારવા જોઈએ.",
+    nameRequired: "પૂરું નામ જરૂરી છે.",
+    phoneRequired: "ફોન નંબર જરૂરી છે.",
+    emailRequired: "ઇમેઇલ સરનામું જરૂરી છે.",
+    invalidEmail: "કૃપા કરીને માન્ય ઇમેઇલ સરનામું દાખલ કરો.",
+    passwordMismatch: "પાસવર્ડ મેળ ખાતા નથી.",
+    phoneInvalid: "કૃપા કરીને માન્ય 10-અંકનો ફોન નંબર દાખલ કરો.",
+    userIdRequired: "યુઝર આઈડી જરૂરી છે.",
+    passwordMinLength: "પાસવર્ડ ઓછામાં ઓછા 8 અક્ષરનો હોવો જોઈએ.",
+    userIdOrEmailRequired: "યુઝર આઈડી અથવા ઇમેઇલ જરૂરી છે.",
+    emailRequiredForReset:
+      "પાસવર્ડ રીસેટ કરવા માટે કૃપા કરીને તમારું ઇમેઇલ સરનામું દાખલ કરો.",
+    invalidOtp: "અમાન્ય OTP.",
+    otpRequired: "કૃપા કરીને માન્ય 6-અંકનો OTP દાખલ કરો.",
+  },
 };
 
 export const ROLES = {
   devotee: {
-    id: 'devotee',
-    icon: 'ph-hands-praying',
-    redirect: 'dashboard.html',
-    en: { 
-      label: 'Devotee', 
-      helper: "Login with phone or email to book darshan slot.", 
-      placeholder: "Phone number or Email" 
+    id: "devotee",
+    icon: "ph-hands-praying",
+    redirect: "dashboard.html",
+    en: {
+      label: "Devotee",
+      helper: "Login with phone or email to book darshan slot.",
+      placeholder: "Phone number or Email",
     },
-    hi: { 
-      label: 'भक्त', 
-      helper: "सेवा बुक के लिए फोन या ईमेल से लॉगिन करें।", 
-      placeholder: "फ़ोन नंबर या ईमेल" 
-    }
+    hi: {
+      label: "भक्त",
+      helper: "सेवा बुक के लिए फोन या ईमेल से लॉगिन करें।",
+      placeholder: "फ़ोन नंबर या ईमेल",
+    },
+    gu: {
+      label: "ભક્ત",
+      helper: "સેવા બુક કરવા માટે ફોન અથવા ઇમેઇલથી લૉગિન કરો.",
+      placeholder: "ફોન નંબર અથવા ઇમેઇલ",
+    },
   },
   mandir_admin: {
-    id: 'mandir_admin',
-    icon: 'ph-crown',
-    redirect: 'admindashboard.html',
-    en: { 
-      label: 'Admin', 
-      helper: "Admin login for temple operations and reports.", 
-      placeholder: "Admin Username" 
+    id: "mandir_admin",
+    icon: "ph-crown",
+    redirect: "admindashboard.html",
+    en: {
+      label: "Admin",
+      helper: "Admin login for temple operations and reports.",
+      placeholder: "Admin Username",
     },
-    hi: { 
-      label: 'प्रशासक', 
-      helper: "मंदिर संचालन और रिपोर्ट के लिए एडमिन लॉगिन।", 
-      placeholder: "एडमिन यूज़रनेम" 
-    }
+    hi: {
+      label: "प्रशासक",
+      helper: "मंदिर संचालन और रिपोर्ट के लिए एडमिन लॉगिन।",
+      placeholder: "एडमिन यूज़रनेम",
+    },
+    gu: {
+      label: "પ્રશાસક",
+      helper: "મંદિર સંચાલન અને રિપોર્ટ માટે એડમિન લૉગિન.",
+      placeholder: "એડમિન યુઝરનામ",
+    },
   },
   security_guard: {
-    id: 'security_guard',
-    icon: 'ph-shield-star',
-    redirect: 'security.html',
-    en: { 
-      label: 'Security', 
-      helper: "Badge ID login for entry/exit logs and gate controls.", 
-      placeholder: "Badge ID (e.g. SEC-001)" 
+    id: "security_guard",
+    icon: "ph-shield-star",
+    redirect: "security.html",
+    en: {
+      label: "Security",
+      helper: "Badge ID login for entry/exit logs and gate controls.",
+      placeholder: "Badge ID (e.g. SEC-001)",
     },
-    hi: { 
-      label: 'सुरक्षा', 
-      helper: "प्रवेश/निकास लॉग और गेट नियंत्रण के लिए बैज आईडी लॉगिन।", 
-      placeholder: "बैज आईडी (जैसे SEC-001)" 
-    }
+    hi: {
+      label: "सुरक्षा",
+      helper: "प्रवेश/निकास लॉग और गेट नियंत्रण के लिए बैज आईडी लॉगिन।",
+      placeholder: "बैज आईडी (जैसे SEC-001)",
+    },
+    gu: {
+      label: "સુરક્ષા",
+      helper: "પ્રવેશ/નિકાસ લૉગ અને ગેટ કંટ્રોલ માટે બેજ આઈડી લૉગિન.",
+      placeholder: "બેજ આઈડી (જેમ કે SEC-001)",
+    },
   },
   parking_incharge: {
-    id: 'parking_incharge',
-    icon: 'ph-car',
-    redirect: 'parking.html',
-    en: { 
-      label: 'Parking', 
-      helper: "Login to manage parking slots and vehicle entries.", 
-      placeholder: "Employee ID" 
+    id: "parking_incharge",
+    icon: "ph-car",
+    redirect: "parking.html",
+    en: {
+      label: "Parking",
+      helper: "Login to manage parking slots and vehicle entries.",
+      placeholder: "Employee ID",
     },
-    hi: { 
-      label: 'पार्किंग', 
-      helper: "पार्किंग स्लॉट और वाहन प्रविष्टियों को प्रबंधित करने के लिए लॉगिन करें।", 
-      placeholder: "कर्मचारी आईडी" 
-    }
-  }
+    hi: {
+      label: "पार्किंग",
+      helper:
+        "पार्किंग स्लॉट और वाहन प्रविष्टियों को प्रबंधित करने के लिए लॉगिन करें।",
+      placeholder: "कर्मचारी आईडी",
+    },
+    gu: {
+      label: "પાર્કિંગ",
+      helper: "પાર્કિંગ સ્લોટ અને વાહન પ્રવેશને મેનેજ કરવા માટે લૉગિન કરો.",
+      placeholder: "કર્મચારી આઈડી",
+    },
+  },
 };
-

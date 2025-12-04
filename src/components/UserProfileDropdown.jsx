@@ -147,8 +147,8 @@ const UserProfileDropdown = () => {
             <button
               onClick={() => {
                 setIsOpen(false);
-                // Navigate to bookings page
-                console.log("View bookings");
+                // Trigger profile navigation event
+                window.dispatchEvent(new CustomEvent("showProfile"));
               }}
               className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
             >

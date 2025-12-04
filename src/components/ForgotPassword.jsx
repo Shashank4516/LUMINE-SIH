@@ -46,10 +46,7 @@ function ForgotPassword({
     setGlobalError("");
 
     if (!userId.trim()) {
-      const errMsg =
-        currentLang === "en"
-          ? "User ID or Email is required."
-          : "यूज़र आईडी या ईमेल आवश्यक है।";
+      const errMsg = t.userIdOrEmailRequired;
       setUserIdError(errMsg);
       return;
     }
@@ -64,10 +61,7 @@ function ForgotPassword({
       if (!isEmail) {
         // If it's a phone number, we need to look up the email in Firestore
         // For now, show error asking for email
-        const errMsg =
-          currentLang === "en"
-            ? "Please enter your email address to reset password."
-            : "पासवर्ड रीसेट करने के लिए कृपया अपना ईमेल पता दर्ज करें।";
+        const errMsg = t.emailRequiredForReset;
         setUserIdError(errMsg);
         setIsLoading(false);
         return;
@@ -91,10 +85,7 @@ function ForgotPassword({
     setGlobalError("");
 
     if (!otp.trim() || otp.length !== 6) {
-      const errMsg =
-        currentLang === "en"
-          ? "Please enter a valid 6-digit OTP."
-          : "कृपया वैध 6-अंकीय OTP दर्ज करें।";
+      const errMsg = t.otpRequired;
       setOtpError(errMsg);
       return;
     }
@@ -138,7 +129,7 @@ function ForgotPassword({
         if (otp.trim().length === 6) {
           setStep(3);
         } else {
-          const errMsg = currentLang === "en" ? "Invalid OTP." : "अमान्य OTP।";
+          const errMsg = t.invalidOtp;
           setOtpError(errMsg);
         }
       }
@@ -156,19 +147,13 @@ function ForgotPassword({
     let isValid = true;
 
     if (!newPassword || newPassword.length < 8) {
-      const errMsg =
-        currentLang === "en"
-          ? "Password must be at least 8 characters."
-          : "पासवर्ड कम से कम 8 अक्षर का होना चाहिए।";
+      const errMsg = t.passwordMinLength;
       setPasswordError(errMsg);
       isValid = false;
     }
 
     if (newPassword !== confirmPassword) {
-      const errMsg =
-        currentLang === "en"
-          ? "Passwords do not match."
-          : "पासवर्ड मेल नहीं खाते।";
+      const errMsg = t.passwordMismatch;
       setConfirmPasswordError(errMsg);
       isValid = false;
     }

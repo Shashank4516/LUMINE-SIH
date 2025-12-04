@@ -23,6 +23,17 @@ function LanguageSwitcher({ currentLang, onLanguageChange }) {
       >
         HI
       </button>
+      <button
+        id="btn-gu"
+        onClick={() => onLanguageChange("gu")}
+        className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+          currentLang === "gu"
+            ? "bg-saffron-600 dark:bg-saffron-500 text-white shadow-sm"
+            : "text-saffron-700 dark:text-gray-300 hover:bg-saffron-100 dark:hover:bg-gray-700"
+        }`}
+      >
+        GU
+      </button>
     </div>
   );
 }

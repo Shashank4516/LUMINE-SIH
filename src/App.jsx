@@ -6,6 +6,7 @@ import LoginForm from "./components/LoginForm";
 import ForgotPassword from "./components/ForgotPassword";
 import Registration from "./components/Registration";
 import SlotBooking from "./components/SlotBooking";
+import Profile from "./components/Profile";
 import Footer from "./components/Footer";
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [showRegistration, setShowRegistration] = useState(false);
   const [showSlotBooking, setShowSlotBooking] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
 
   // Check if user just registered (via localStorage flag)
   useEffect(() => {
@@ -24,6 +26,27 @@ function App() {
       setShowSlotBooking(true);
       setShowRegistration(false);
     }
+  }, []);
+
+  // Listen for profile navigation events
+  useEffect(() => {
+    const handleShowProfile = () => {
+      setShowProfile(true);
+      setShowSlotBooking(false);
+    };
+
+    const handleBackToBooking = () => {
+      setShowProfile(false);
+      setShowSlotBooking(true);
+    };
+
+    window.addEventListener("showProfile", handleShowProfile);
+    window.addEventListener("backToBooking", handleBackToBooking);
+
+    return () => {
+      window.removeEventListener("showProfile", handleShowProfile);
+      window.removeEventListener("backToBooking", handleBackToBooking);
+    };
   }, []);
 
   const handleLanguageChange = (lang) => {
@@ -48,10 +71,24 @@ function App() {
     console.log("State updated: showSlotBooking = true");
   };
 
+  // If Profile is shown, render it full screen
+  if (showProfile) {
+    return (
+      <Profile
+        onBack={() => {
+          setShowProfile(false);
+          setShowSlotBooking(true);
+        }}
+      />
+    );
+  }
+
+  // If SlotBooking is shown, render it full screen without the login layout
+  if (showSlotBooking) {
+    return <SlotBooking />;
+  }
+
   const getCurrentView = () => {
-    if (showSlotBooking) {
-      return <SlotBooking />;
-    }
     if (showRegistration) {
       return (
         <Registration
@@ -82,11 +119,6 @@ function App() {
       />
     );
   };
-
-  // If SlotBooking is shown, render it full screen without the login layout
-  if (showSlotBooking) {
-    return <SlotBooking />;
-  }
 
   return (
     <div className="font-sans text-gray-800 dark:text-gray-100 h-screen flex flex-col relative overflow-hidden bg-sand dark:bg-gray-900 transition-colors duration-200">

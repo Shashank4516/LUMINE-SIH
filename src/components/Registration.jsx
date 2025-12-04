@@ -43,10 +43,7 @@ function Registration({ currentLang, onBackToLogin, onRegistrationSuccess }) {
     }
 
     if (!formData.password || formData.password.length < 8) {
-      const errPass =
-        currentLang === "en"
-          ? "Password must be at least 8 characters."
-          : "पासवर्ड कम से कम 8 अक्षर का होना चाहिए।";
+      const errPass = t.passwordMinLength;
       newErrors.password = errPass;
     }
 
