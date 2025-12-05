@@ -69,13 +69,16 @@ export const signInUser = async (userId, password, role = null) => {
   try {
     let email = userId.trim();
 
+    // Allow "admin" as a special user ID
+    const isAdmin = email.toLowerCase() === "admin";
+
     // Check if userId is email or phone number
     const isEmail = email.includes("@");
 
     // If it's a phone number, we need to find the email first
     // Note: Backend doesn't support phone login directly, so we'll need to handle this
     // For now, we'll assume it's an email
-    if (!isEmail) {
+    if (!isEmail && !isAdmin) {
       // You could add a separate endpoint to lookup email by phone, or require email login
       throw new Error(
         "Please use your email address to sign in. Phone number login is not supported yet."
@@ -88,7 +91,7 @@ export const signInUser = async (userId, password, role = null) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        email,
+        email: isAdmin ? "admin" : email,
         password,
       }),
     });
@@ -107,16 +110,22 @@ export const signInUser = async (userId, password, role = null) => {
       parking_incharge: "parking.html",
     };
 
+    // Determine role from response or use provided role
+    const userRole = data.user.role || role || "devotee";
+
     return {
       user: {
         id: data.user.id,
         email: data.user.email,
         displayName: data.user.fullName,
         fullName: data.user.fullName,
-        role: role || "devotee", // Default to devotee if not specified
+        role: userRole,
       },
       token: data.token,
-      redirectUrl: redirectUrls[role || "devotee"] || "dashboard.html",
+      redirectUrl:
+        redirectUrls[userRole] ||
+        redirectUrls[role || "devotee"] ||
+        "dashboard.html",
     };
   } catch (error) {
     throw handleBackendError(error);
@@ -146,6 +155,7 @@ export const signOutUser = async () => {
  * @param {string} email - User email
  * @returns {Promise<void>}
  */
+// eslint-disable-next-line no-unused-vars
 export const resetPassword = async (email) => {
   // TODO: Implement when backend endpoint is available
   throw new Error("Password reset is not yet implemented with backend auth");

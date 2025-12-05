@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { TRANSLATIONS, ROLES } from "../constants/translations";
 import RoleSelector from "./RoleSelector";
 import { signInUser } from "../services/backendAuth";
@@ -21,6 +22,7 @@ function LoginForm({
   const [isLoading, setIsLoading] = useState(false);
   const [isShaking, setIsShaking] = useState(false);
 
+  const navigate = useNavigate();
   const t = TRANSLATIONS[currentLang];
   const roleData = ROLES[currentRole];
 
@@ -34,19 +36,66 @@ function LoginForm({
 
     const errId = t.userIdRequired;
     const errPass = t.passwordMinLength;
+    const errEmail = t.invalidEmail || "Please enter a valid email address.";
 
-    if (!userId.trim()) {
+    const trimmedUserId = userId.trim();
+    const isAdmin = trimmedUserId.toLowerCase() === "admin";
+
+    if (!trimmedUserId) {
       setUserIdError(errId);
+      isValid = false;
+    } else if (!isAdmin && (
+      !trimmedUserId.includes("@") ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedUserId)
+    )) {
+      // Validate email format (except for admin user)
+      setUserIdError(errEmail);
       isValid = false;
     }
 
-    if (!password || password.length < 8) {
+    // Admin password validation (admin123 is 8 chars, but we allow it)
+    if (!password) {
+      setPasswordError(errPass);
+      isValid = false;
+    } else if (!isAdmin && password.length < 8) {
       setPasswordError(errPass);
       isValid = false;
     }
 
     if (!isValid) return;
 
+    // Static admin login - no backend required
+    const ADMIN_USER_ID = "admin";
+    const ADMIN_PASSWORD = "admin123";
+    
+    if (isAdmin && password === ADMIN_PASSWORD) {
+      // Create admin user object
+      const adminUser = {
+        id: "admin",
+        email: "admin@lumine.com",
+        displayName: "Administrator",
+        fullName: "Administrator",
+        role: "mandir_admin",
+      };
+
+      // Save admin session to storage
+      const storage = rememberMe ? localStorage : sessionStorage;
+      storage.setItem("lumine_token", "admin_static_token");
+      storage.setItem("lumine_user", JSON.stringify(adminUser));
+
+      if (!rememberMe) {
+        localStorage.removeItem("lumine_token");
+        localStorage.removeItem("lumine_user");
+      }
+
+      // Redirect to admin dashboard using React Router
+      setTimeout(() => {
+        navigate("/admin/dashboard");
+      }, 500);
+      return;
+    }
+
+    // Regular user authentication (backend required)
     setIsLoading(true);
     setGlobalError("");
 
@@ -179,7 +228,7 @@ function LoginForm({
                       ? "border-red-500 dark:border-red-400 focus:ring-red-500"
                       : "border-gray-300 dark:border-gray-600"
                   }`}
-                  placeholder={roleData[currentLang].placeholder}
+                  placeholder="Enter your email or admin ID"
                 />
               </div>
               {userIdError && (

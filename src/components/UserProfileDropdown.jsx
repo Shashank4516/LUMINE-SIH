@@ -1,21 +1,28 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { signOutUser } from "../services/backendAuth";
 
 const UserProfileDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState(null);
   const dropdownRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Get user data from localStorage
+    // Get user data from localStorage or sessionStorage
     const loadUserData = () => {
-      const userData = localStorage.getItem("lumine_user");
+      const userData =
+        localStorage.getItem("lumine_user") ||
+        sessionStorage.getItem("lumine_user");
       if (userData) {
         try {
           setUser(JSON.parse(userData));
         } catch (error) {
           console.error("Error parsing user data:", error);
+          setUser(null);
         }
+      } else {
+        setUser(null);
       }
     };
 
@@ -59,8 +66,13 @@ const UserProfileDropdown = () => {
   const handleLogout = async () => {
     try {
       await signOutUser();
-      // Redirect to login page
-      window.location.href = "/";
+      // Clear user state
+      setUser(null);
+      setIsOpen(false);
+      // Dispatch logout event to notify App.jsx
+      window.dispatchEvent(new CustomEvent("userLoggedOut"));
+      // Navigate to sign-in page using React Router
+      navigate("/");
     } catch (error) {
       console.error("Logout error:", error);
     }

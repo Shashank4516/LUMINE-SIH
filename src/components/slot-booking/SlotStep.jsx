@@ -27,7 +27,7 @@ const SlotStep = ({
           { id: 2, name: "Dwarkadhish Temple" },
           { id: 3, name: "Nageshwar Jyotirlinga" },
           { id: 4, name: "Rukmini Devi Temple" },
-        ];
+  ];
 
   const timeSlots = [
     "06:00 AM - 08:00 AM",
