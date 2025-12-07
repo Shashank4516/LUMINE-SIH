@@ -206,25 +206,42 @@ export const getUserBookings = async (userId) => {
       localStorage.getItem("lumine_token") ||
       sessionStorage.getItem("lumine_token");
 
-    const response = await fetch(
-      `${API_BASE_URL}/api/bookings/user/${userId}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      }
-    );
+    const url = `${API_BASE_URL}/api/bookings/user/${userId}`;
+    console.log("getUserBookings: Fetching from:", url);
+    console.log("getUserBookings: User ID:", userId);
+    console.log("getUserBookings: Has token:", !!token);
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+    });
+
+    console.log("getUserBookings: Response status:", response.status);
+    console.log("getUserBookings: Response ok:", response.ok);
+
+    // Handle rate limiting (429)
+    if (response.status === 429) {
+      console.warn("getUserBookings: Rate limited by server");
+      throw new Error(
+        "Server is busy (rate limited). Please wait a moment and try again."
+      );
+    }
 
     let data;
     try {
       data = await parseJSON(response);
+      console.log("getUserBookings: Response data:", data);
     } catch (parseError) {
+      console.error("getUserBookings: Parse error:", parseError);
       if (!response.ok) {
+        const errorText = await response.text().catch(() => "Unknown error");
+        console.error("getUserBookings: Error response:", errorText);
         throw new Error(
           `Server error (${response.status}): ${
-            parseError.message || "Invalid response"
+            parseError.message || errorText || "Invalid response"
           }`
         );
       }
@@ -232,13 +249,37 @@ export const getUserBookings = async (userId) => {
     }
 
     if (!response.ok) {
-      throw new Error(
-        data?.error?.message || data?.error || "Failed to fetch user bookings"
-      );
+      const errorMsg =
+        data?.error?.message ||
+        data?.error ||
+        `HTTP ${response.status}: Failed to fetch user bookings`;
+      console.error("getUserBookings: API error:", errorMsg);
+      throw new Error(errorMsg);
     }
 
     return data;
   } catch (error) {
+    console.error("getUserBookings: Caught error:", error);
+
+    // Check if it's a rate limit error (already handled above, but catch edge cases)
+    if (
+      error.message?.includes("rate limit") ||
+      error.message?.includes("429")
+    ) {
+      throw error; // Re-throw as-is
+    }
+
+    // Check if it's a network/CORS error
+    if (
+      error.message?.includes("fetch") ||
+      error.message?.includes("Network") ||
+      error.message?.includes("CORS") ||
+      error.message?.includes("Failed to fetch")
+    ) {
+      throw new Error(
+        "Network error. Please check your connection and ensure the backend is running."
+      );
+    }
     throw handleBackendError(error);
   }
 };

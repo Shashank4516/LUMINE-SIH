@@ -1,5 +1,5 @@
-import React from "react";
-
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import useSlotBooking from "../hooks/useSlotBooking";
 import HeaderSmall from "./slot-booking/HeaderSmall";
 import StepWizard from "./slot-booking/StepWizard";
@@ -8,8 +8,46 @@ import MembersStep from "./slot-booking/MembersStep";
 import ReviewStep from "./slot-booking/ReviewStep";
 import SuccessOverlay from "./slot-booking/SuccessOverlay";
 import FormNav from "./slot-booking/FormNav";
+import { getCurrentUser } from "../services/backendAuth";
 
 const SlotBooking = () => {
+  const navigate = useNavigate();
+
+  // Check if user is authenticated before showing this page
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const token = localStorage.getItem("lumine_token") || sessionStorage.getItem("lumine_token");
+        if (!token) {
+          // No token, redirect to landing
+          console.log("No auth token, redirecting to landing");
+          navigate("/", { replace: true });
+          return;
+        }
+
+        const user = await getCurrentUser();
+        if (!user || !user.id) {
+          // Invalid user, clear auth and redirect
+          console.log("Invalid user data, redirecting to landing");
+          localStorage.removeItem("lumine_token");
+          localStorage.removeItem("lumine_user");
+          sessionStorage.removeItem("lumine_token");
+          sessionStorage.removeItem("lumine_user");
+          navigate("/", { replace: true });
+        }
+      } catch (error) {
+        // Error checking auth, redirect to landing
+        console.log("Auth check failed, redirecting to landing:", error);
+        localStorage.removeItem("lumine_token");
+        localStorage.removeItem("lumine_user");
+        sessionStorage.removeItem("lumine_token");
+        sessionStorage.removeItem("lumine_user");
+        navigate("/", { replace: true });
+      }
+    };
+
+    checkAuth();
+  }, [navigate]);
   const {
     currentStep,
     totalSteps,

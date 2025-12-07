@@ -13,10 +13,11 @@ body {
     font-family: 'Poppins', sans-serif;
     background-color: var(--bg-body);
     color: #1e293b;
-    height: 100vh;
+    height: auto;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow-y: auto;
 }
 
 .brand-font {
@@ -40,6 +41,7 @@ body {
 .app-container {
     display: flex;
     flex: 1;
+    height: calc(100vh - 70px);
     overflow: hidden;
 }
 
@@ -52,6 +54,8 @@ body {
     flex-direction: column;
     padding: 20px;
     flex-shrink: 0;
+    height: 100%;
+    overflow-y: auto;
 }
 
 .nav-item {
@@ -84,11 +88,11 @@ body {
     padding: 16px;
     overflow-y: auto;
     position: relative;
+    height: 100%;
 }
 
 .view-section {
     display: none;
-    height: 100%;
 }
 
 .view-section.active {
@@ -99,7 +103,6 @@ body {
     display: grid;
     grid-template-columns: 400px 1fr;
     gap: 16px;
-    height: 100%;
 }
 
 @media (max-width: 1024px) {
@@ -137,7 +140,6 @@ body {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    height: 100%;
 }
 
 /* Buttons */
