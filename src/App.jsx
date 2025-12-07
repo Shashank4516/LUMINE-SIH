@@ -9,8 +9,8 @@ import Registration from "./components/Registration";
 import SlotBooking from "./components/SlotBooking";
 import Profile from "./components/Profile";
 import Footer from "./components/Footer";
+import AdminRoutes from "./components/admin/AdminRoutes";
 import { getCurrentUser } from "./services/backendAuth";
-import Landing from "./pages/Landing";
 
 function App() {
   const [currentLang, setCurrentLang] = useState("en");
@@ -21,35 +21,31 @@ function App() {
   const [showProfile, setShowProfile] = useState(false);
 
   // Check if user is already logged in or just registered
-  // Note: This only affects the /old route, not the main routes
   useEffect(() => {
     const checkAuthStatus = async () => {
-      // Only check auth status for the /old route
-      if (window.location.pathname === "/old") {
-        // Check if user just registered (via localStorage flag)
-        const justRegistered = localStorage.getItem("lumine_just_registered");
-        if (justRegistered === "true") {
-          console.log("User just registered, redirecting to slot booking...");
-          localStorage.removeItem("lumine_just_registered");
-          setShowSlotBooking(true);
-          setShowRegistration(false);
-          return;
-        }
+      // Check if user just registered (via localStorage flag)
+      const justRegistered = localStorage.getItem("lumine_just_registered");
+      if (justRegistered === "true") {
+        console.log("User just registered, redirecting to slot booking...");
+        localStorage.removeItem("lumine_just_registered");
+        setShowSlotBooking(true);
+        setShowRegistration(false);
+        return;
+      }
 
-        // Check if user is already logged in
-        const user = await getCurrentUser();
-        if (user) {
-          console.log("User already logged in, redirecting to slot booking...");
-          setShowSlotBooking(true);
-          setShowRegistration(false);
-          setShowForgotPassword(false);
-        } else {
-          // User is not logged in, show sign-in page
-          setShowSlotBooking(false);
-          setShowProfile(false);
-          setShowRegistration(false);
-          setShowForgotPassword(false);
-        }
+      // Check if user is already logged in
+      const user = await getCurrentUser();
+      if (user) {
+        console.log("User already logged in, redirecting to slot booking...");
+        setShowSlotBooking(true);
+        setShowRegistration(false);
+        setShowForgotPassword(false);
+      } else {
+        // User is not logged in, show sign-in page
+        setShowSlotBooking(false);
+        setShowProfile(false);
+        setShowRegistration(false);
+        setShowForgotPassword(false);
       }
     };
 
@@ -150,14 +146,12 @@ function App() {
     );
   };
 
-  // Render routes
+  // Render admin routes
   return (
     <Routes>
-      <Route path="/" element={<Landing />} />
-      <Route path="/dashboard/slot-booking" element={<SlotBooking />} />
-      <Route path="/dashboard" element={<Navigate to="/dashboard/slot-booking" replace />} />
+      <Route path="/admin/*" element={<AdminRoutes />} />
       <Route
-        path="/old"
+        path="/*"
         element={
           <>
             {showProfile ? (
@@ -201,7 +195,6 @@ function App() {
           </>
         }
       />
-      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

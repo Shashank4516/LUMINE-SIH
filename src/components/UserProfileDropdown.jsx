@@ -100,7 +100,7 @@ const UserProfileDropdown = () => {
               .slice(0, 2)}
           </span>
         ) : (
-          <i className="ph ph-user text-saffron-700 dark:text-saffron-400 text-lg" style={{ display: 'inline-block' }}></i>
+          <i className="ph ph-user text-saffron-700 dark:text-saffron-400 text-lg"></i>
         )}
       </button>
 
@@ -120,7 +120,7 @@ const UserProfileDropdown = () => {
                       .slice(0, 2)}
                   </span>
                 ) : (
-                  <i className="ph ph-user text-saffron-700 dark:text-saffron-400 text-xl" style={{ display: 'inline-block' }}></i>
+                  <i className="ph ph-user text-saffron-700 dark:text-saffron-400 text-xl"></i>
                 )}
               </div>
               <div className="flex-1 min-w-0">
@@ -148,8 +148,8 @@ const UserProfileDropdown = () => {
             <button
               onClick={() => {
                 setIsOpen(false);
-                // Navigate to profile page
-                navigate("/dashboard/my-visits");
+                // Navigate to profile page or show profile modal
+                console.log("View profile");
               }}
               className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
             >
@@ -159,8 +159,8 @@ const UserProfileDropdown = () => {
             <button
               onClick={() => {
                 setIsOpen(false);
-                // Navigate to bookings page using React Router
-                navigate("/dashboard/my-visits");
+                // Trigger profile navigation event
+                window.dispatchEvent(new CustomEvent("showProfile"));
               }}
               className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
             >
