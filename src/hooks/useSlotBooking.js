@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { createBooking, getAllTemples } from "../services/bookingService";
+import { getLocations, getPredictions } from "../services/predictionService";
 
 // Generate booking number
 const generateBookingNumber = () => {
@@ -26,6 +27,13 @@ const useSlotBooking = () => {
   const [error, setError] = useState(null);
   const [temples, setTemples] = useState([]);
   const [templeData, setTempleData] = useState({});
+
+  // Prediction states
+  const [locations, setLocations] = useState([]);
+  const [availableNodes, setAvailableNodes] = useState([]);
+  const [selectedNodeId, setSelectedNodeId] = useState("");
+  const [predictions, setPredictions] = useState(null);
+  const [isLoadingPredictions, setIsLoadingPredictions] = useState(false);
 
   // Fetch temples from backend on mount
   useEffect(() => {
@@ -91,6 +99,81 @@ const useSlotBooking = () => {
 
     fetchTemples();
   }, []);
+
+  // Fetch locations for predictions
+  useEffect(() => {
+    const fetchLocs = async () => {
+      try {
+        const data = await getLocations();
+        if (data && data.locations) {
+          setLocations(data.locations);
+        }
+      } catch (err) {
+        console.error("Failed to fetch locations", err);
+      }
+    };
+    fetchLocs();
+  }, []);
+
+  // Update available nodes when temple changes
+  useEffect(() => {
+    if (temple && locations.length > 0) {
+      // Simple fuzzy match: check if site_id contains the first word of the temple name
+      // e.g. "Somnath" matches "somnath-temple"
+      const firstWord = temple.split(" ")[0].toLowerCase();
+      const nodes = locations.filter((loc) =>
+        loc.site_id.toLowerCase().includes(firstWord)
+      );
+      setAvailableNodes(nodes);
+      
+      // Reset selection or set default
+      if (nodes.length > 0) {
+        // If previously selected node is still valid, keep it, else select first
+        if (!nodes.find(n => n.node_id === selectedNodeId)) {
+            setSelectedNodeId(nodes[0].node_id);
+        }
+      } else {
+        setSelectedNodeId("");
+      }
+    } else {
+      setAvailableNodes([]);
+      setSelectedNodeId("");
+    }
+  }, [temple, locations, selectedNodeId]);
+
+  // Fetch predictions when node and date are selected
+  useEffect(() => {
+    const fetchPreds = async () => {
+      if (selectedNodeId && date && availableNodes.length > 0) {
+        const siteId = availableNodes.find(
+          (n) => n.node_id === selectedNodeId
+        )?.site_id;
+
+        if (siteId) {
+          setIsLoadingPredictions(true);
+          try {
+            const data = await getPredictions(siteId, selectedNodeId, date);
+            setPredictions(data);
+          } catch (err) {
+            console.error("Error fetching predictions:", err);
+            setPredictions(null);
+          } finally {
+            setIsLoadingPredictions(false);
+          }
+        }
+      } else {
+        setPredictions(null);
+      }
+    };
+
+    // Debounce slightly to avoid rapid calls if user is typing date (though date picker usually sets once)
+    const timeoutId = setTimeout(fetchPreds, 300);
+    return () => clearTimeout(timeoutId);
+  }, [selectedNodeId, date, availableNodes]);
+
+  const handleNodeChange = (nodeId) => {
+    setSelectedNodeId(nodeId);
+  };
 
   // Update temple name when temples are loaded and a templeId is set but name is missing
   useEffect(() => {
@@ -676,6 +759,12 @@ const useSlotBooking = () => {
     prevStep,
     submitBooking,
     resetBooking,
+    // Prediction exports
+    availableNodes,
+    selectedNodeId,
+    handleNodeChange,
+    predictions,
+    isLoadingPredictions,
   };
 };
 

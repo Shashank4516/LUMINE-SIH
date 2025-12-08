@@ -31,6 +31,12 @@ const SlotBooking = () => {
     nextStep,
     prevStep,
     submitBooking,
+    // Prediction props
+    availableNodes,
+    selectedNodeId,
+    handleNodeChange,
+    predictions,
+    isLoadingPredictions,
   } = useSlotBooking();
 
   return (
@@ -53,6 +59,12 @@ const SlotBooking = () => {
               onTempleChange={handleTempleChange}
               onDateChange={handleDateChange}
               onTimeChange={handleTimeChange}
+              // Prediction props
+              availableNodes={availableNodes}
+              selectedNodeId={selectedNodeId}
+              onNodeChange={handleNodeChange}
+              predictions={predictions}
+              isLoadingPredictions={isLoadingPredictions}
             />
 
             <MembersStep
